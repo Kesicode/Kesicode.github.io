@@ -406,19 +406,18 @@
 
     async function loadData() {
       try {
-        const res = await fetch("https://github-contributions-api.deno.dev/Kesicode.json", { cache: "no-store" });
+        // Use jogruber API with y=all to get ALL-TIME contributions across every year
+        const res = await fetch("https://github-contributions-api.jogruber.de/v4/Kesicode?y=all", { cache: "no-store" });
         if (!res.ok) throw new Error("bad status " + res.status);
         const raw = await res.json();
 
-        // Flatten weeks -> days, sorted by date ascending
+        // raw.contributions is a flat array of { date, count, level }, already sorted
         const days = raw.contributions
-          .flat()
-          .map(d => ({ date: d.date, count: d.contributionCount }))
-          .filter(d => d.date) // remove any empty slots
+          .filter(d => d.date)
           .sort((a, b) => a.date.localeCompare(b.date));
 
-        // --- Total contributions: sum from days (matches API) ---
-        const totalContributions = days.reduce((s, d) => s + d.count, 0);
+        // --- Total contributions: sum across ALL years ---
+        const totalContributions = Object.values(raw.total).reduce((s, v) => s + v, 0);
 
         // --- Active days & best day ---
         let active_days = 0;
@@ -426,7 +425,7 @@
         days.forEach(d => {
           if (d.count > 0) {
             active_days++;
-            if (d.count > best_day.count) best_day = { ...d };
+            if (d.count > best_day.count) best_day = { date: d.date, count: d.count };
           }
         });
 
@@ -445,13 +444,10 @@
         });
 
         // --- Current streak (backward pass) ---
-        // Walk back from the last day. If the very last day is 0 (today not yet contributed),
-        // skip it once, then count consecutive days with contributions.
+        // Allow today (last entry) to be 0 — skip it once, then count back
         let currLen = 0, currStart = "", currEnd = "";
         let i = days.length - 1;
-        // Allow today (last entry) to be 0 — skip it
         if (i >= 0 && days[i].count === 0) i--;
-        // Now count backwards while days have contributions
         while (i >= 0 && days[i].count > 0) {
           if (currLen === 0) currEnd = days[i].date;
           currStart = days[i].date;
