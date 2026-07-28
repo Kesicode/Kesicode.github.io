@@ -409,52 +409,70 @@
         const res = await fetch("https://github-contributions-api.deno.dev/Kesicode.json", { cache: "no-store" });
         if (!res.ok) throw new Error("bad status " + res.status);
         const raw = await res.json();
-        const days = raw.contributions.flat().map(d => ({ date: d.date, count: d.contributionCount }));
-        
+
+        // Flatten weeks -> days, sorted by date ascending
+        const days = raw.contributions
+          .flat()
+          .map(d => ({ date: d.date, count: d.contributionCount }))
+          .filter(d => d.date) // remove any empty slots
+          .sort((a, b) => a.date.localeCompare(b.date));
+
+        // --- Total contributions: sum from days (matches API) ---
+        const totalContributions = days.reduce((s, d) => s + d.count, 0);
+
+        // --- Active days & best day ---
         let active_days = 0;
         let best_day = { date: "", count: 0 };
-        let temp_streak = { length: 0, start: "", end: "" };
-        let longest_streak = { length: 0, start: "", end: "" };
-        
         days.forEach(d => {
-            if (d.count > 0) {
-                active_days++;
-                if (d.count > best_day.count) best_day = { ...d };
-                if (temp_streak.length === 0) temp_streak.start = d.date;
-                temp_streak.length++;
-                temp_streak.end = d.date;
-            } else {
-                if (temp_streak.length > longest_streak.length) longest_streak = { ...temp_streak };
-                temp_streak = { length: 0, start: "", end: "" };
-            }
+          if (d.count > 0) {
+            active_days++;
+            if (d.count > best_day.count) best_day = { ...d };
+          }
         });
-        if (temp_streak.length > longest_streak.length) longest_streak = { ...temp_streak };
-        
-        let currLen = 0, currEnd = "", currStart = "";
-        for(let i = days.length - 1; i >= 0; i--) {
-            if (days[i].count > 0) {
-                if (currLen === 0) currEnd = days[i].date;
-                currStart = days[i].date;
-                currLen++;
-            } else {
-                if (i === days.length - 1) continue;
-                break;
-            }
+
+        // --- Longest streak (forward pass) ---
+        let longest_streak = { length: 0, start: "", end: "" };
+        let temp = { length: 0, start: "", end: "" };
+        days.forEach(d => {
+          if (d.count > 0) {
+            if (temp.length === 0) temp.start = d.date;
+            temp.length++;
+            temp.end = d.date;
+            if (temp.length > longest_streak.length) longest_streak = { ...temp };
+          } else {
+            temp = { length: 0, start: "", end: "" };
+          }
+        });
+
+        // --- Current streak (backward pass) ---
+        // Walk back from the last day. If the very last day is 0 (today not yet contributed),
+        // skip it once, then count consecutive days with contributions.
+        let currLen = 0, currStart = "", currEnd = "";
+        let i = days.length - 1;
+        // Allow today (last entry) to be 0 — skip it
+        if (i >= 0 && days[i].count === 0) i--;
+        // Now count backwards while days have contributions
+        while (i >= 0 && days[i].count > 0) {
+          if (currLen === 0) currEnd = days[i].date;
+          currStart = days[i].date;
+          currLen++;
+          i--;
         }
         const current_streak = { length: currLen, start: currStart, end: currEnd };
 
         DATA = {
-            username: "Kesicode",
-            total_contributions: raw.totalContributions,
-            range: { start: days[0].date, end: days[days.length-1].date },
-            active_days,
-            avg_per_active_day: active_days ? +(raw.totalContributions / active_days).toFixed(1) : 0,
-            best_day,
-            current_streak,
-            longest_streak,
-            days
+          username: "Kesicode",
+          total_contributions: totalContributions,
+          range: { start: days[0]?.date || "", end: days[days.length - 1]?.date || "" },
+          active_days,
+          avg_per_active_day: active_days ? +(totalContributions / active_days).toFixed(1) : 0,
+          best_day,
+          current_streak,
+          longest_streak,
+          days
         };
       } catch (e) {
+        console.error("Failed to load contribution data:", e);
         DATA = window.__FALLBACK_DATA;
       }
       renderStats();
