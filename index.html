@@ -412,8 +412,10 @@
         const raw = await res.json();
 
         // raw.contributions is a flat array of { date, count, level }, already sorted
+        // IMPORTANT: API returns full-year data including FUTURE dates with 0 — filter them out
+        const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
         const days = raw.contributions
-          .filter(d => d.date)
+          .filter(d => d.date && d.date <= today)
           .sort((a, b) => a.date.localeCompare(b.date));
 
         // --- Total contributions: sum across ALL years ---
