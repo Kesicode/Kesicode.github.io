@@ -26,7 +26,10 @@ jobs:
 
       - name: Fetch contributions from GitHub GraphQL API
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # GH_PAT: Personal Access Token with read:user scope (needed for private contributions)
+          # Set this in repo Settings → Secrets → Actions → New secret named GH_PAT
+          # Without it, only public contributions are counted.
+          GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         run: python fetch_contributions.py
 
       - name: Commit and push contributions.json
