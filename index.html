@@ -418,8 +418,8 @@
           .filter(d => d.date && d.date <= today)
           .sort((a, b) => a.date.localeCompare(b.date));
 
-        // --- Total contributions: sum across ALL years ---
-        const totalContributions = Object.values(raw.total).reduce((s, v) => s + v, 0);
+        // --- Total contributions: sum from filtered days (matches heatmap range accurately) ---
+        const totalContributions = days.reduce((s, d) => s + d.count, 0);
 
         // --- Active days & best day ---
         let active_days = 0;
@@ -523,29 +523,52 @@
     function buildHeatmapEl() {
       const wrap = document.createElement("div");
       wrap.className = "heatmap-wrap";
+
+      // Show last 52 weeks (364 days) ending today — same as GitHub
+      const allDays = DATA.days;
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - 364);
+      const cutoffStr = cutoff.toISOString().slice(0, 10);
+      const days = allDays.filter(d => d.date >= cutoffStr);
+
+      // Build a map for O(1) lookup: date -> count
+      const dayMap = {};
+      days.forEach(d => { dayMap[d.date] = d.count; });
+
+      // Find the Sunday on or before the first day in our window
+      const firstDay = new Date(cutoffStr + "T00:00:00");
+      const startSunday = new Date(firstDay);
+      startSunday.setDate(startSunday.getDate() - startSunday.getDay()); // go back to Sunday
+
+      // Find the Saturday on or after today
+      const lastDay = new Date(DATA.range.end + "T00:00:00");
+      const endSaturday = new Date(lastDay);
+      endSaturday.setDate(endSaturday.getDate() + (6 - endSaturday.getDay())); // go forward to Saturday
+
+      // Build a week-column array: each column is 7 days Sun-Sat
+      const cols = [];
+      const cursor = new Date(startSunday);
+      while (cursor <= endSaturday) {
+        const col = [];
+        for (let dow = 0; dow < 7; dow++) {
+          const dateStr = cursor.toISOString().slice(0, 10);
+          const count = dayMap[dateStr] !== undefined ? dayMap[dateStr] : null; // null = outside range
+          const isFuture = dateStr > DATA.range.end;
+          col.push(isFuture ? null : { date: dateStr, count: count !== null ? count : (dateStr >= cutoffStr ? 0 : null) });
+          cursor.setDate(cursor.getDate() + 1);
+        }
+        cols.push(col);
+      }
+
+      // Render grid
       const grid = document.createElement("div");
       grid.className = "heatmap";
 
-      const days = DATA.days;
-      const first = new Date(days[0].date + "T00:00:00");
-      const leadPad = (first.getDay()); // sunday=0 already
-      let col = new Array(leadPad).fill(null);
-
-      const cols = [];
-      days.forEach((d) => {
-        const date = new Date(d.date + "T00:00:00");
-        const weekday = date.getDay();
-        while (col.length < weekday) col.push(null);
-        col.push(d);
-        if (col.length === 7) { cols.push(col); col = []; }
-      });
-      if (col.length) { while (col.length < 7) col.push(null); cols.push(col); }
-
-      cols.forEach((column) => {
-        column.forEach((d) => {
+      cols.forEach(col => {
+        col.forEach(d => {
           const cell = document.createElement("div");
           cell.className = "cell";
-          if (!d) {
+          if (!d || d.count === null) {
             cell.style.background = "transparent";
             cell.style.cursor = "default";
           } else {
@@ -554,7 +577,7 @@
             cell.addEventListener("mousemove", (e) => {
               tooltip.style.display = "block";
               tooltip.style.left = e.clientX + 14 + "px";
-              tooltip.style.top = e.clientY + 14 + "px";
+              tooltip.style.top  = e.clientY + 14 + "px";
               tooltip.textContent = `${d.date}: ${d.count} contribution${d.count === 1 ? "" : "s"}`;
             });
             cell.addEventListener("mouseleave", () => { tooltip.style.display = "none"; });
@@ -576,6 +599,7 @@
 
       return wrap;
     }
+
 
     /* ---------------------------------------------------------------------- */
     const COMMANDS = {
