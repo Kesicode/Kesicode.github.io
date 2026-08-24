@@ -2,15 +2,15 @@ name: Update Contributions Data
 
 on:
   schedule:
-    # Runs daily at 18:30 UTC (midnight IST)
-    - cron: '30 18 * * *'
+    # Run every 10 minutes — keeps data fresh within ~10 minutes of any push
+    - cron: '*/10 * * * *'
   workflow_dispatch: # Allow manual trigger from GitHub Actions tab
 
 jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Needed to commit contributions.json back to repo
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -24,12 +24,7 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Fetch contributions from GitHub GraphQL API
-        env:
-          # GH_PAT: Personal Access Token with read:user scope (needed for private contributions)
-          # Set this in repo Settings → Secrets → Actions → New secret named GH_PAT
-          # Without it, only public contributions are counted.
-          GITHUB_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      - name: Fetch contributions (no token needed)
         run: python fetch_contributions.py
 
       - name: Commit and push contributions.json
@@ -37,6 +32,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add contributions.json
-          # Only commit if contributions.json actually changed
-          git diff --staged --quiet && echo "No changes to commit" || \
-            (git commit -m "chore: update contribution data [skip ci]" && git push)
+          git diff --staged --quiet && echo "No changes" || \
+            (git commit -m "chore: refresh contribution data [skip ci]" && git push)
