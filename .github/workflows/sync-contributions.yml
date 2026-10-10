@@ -1,0 +1,54 @@
+name: Sync contributions from profile repo
+
+# Triggered either:
+#   1. By a repository_dispatch from Kesicode/Kesicode when profile data updates
+#   2. On a daily cron (safety net in case dispatch was missed)
+#   3. Manually from the GitHub Actions UI
+
+on:
+  repository_dispatch:
+    types: [profile-data-updated]
+  schedule:
+    - cron: "0 4,10,16,22 * * *"   # 4× daily — safety net
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout portfolio repo
+        uses: actions/checkout@v4
+
+      - name: Download contributions.json from Kesicode/Kesicode
+        run: |
+          echo "Fetching contributions.json from Kesicode/Kesicode..."
+          curl -s -L \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/Kesicode/Kesicode/contents/data/contributions.json" \
+          | python3 -c "
+          import sys, json, base64
+          r = json.load(sys.stdin)
+          data = base64.b64decode(r['content']).decode('utf-8')
+          with open('contributions.json', 'w') as f:
+              f.write(data)
+          print('contributions.json written successfully')
+          d = json.loads(data)
+          print(f'  total: {d.get(\"total_contributions\")} contributions')
+          print(f'  range: {d.get(\"range\", {}).get(\"start\")} → {d.get(\"range\", {}).get(\"end\")}')
+          print(f'  streak: current {d.get(\"current_streak\", {}).get(\"length\")} days, longest {d.get(\"longest_streak\", {}).get(\"length\")} days')
+          print(f'  best day: {d.get(\"best_day\", {}).get(\"date\")} ({d.get(\"best_day\", {}).get(\"count\")} contributions)')
+          "
+          echo "Done."
+
+      - name: Commit updated contributions.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add contributions.json
+          git diff --staged --quiet && echo "No changes — data already up to date." || \
+            (git commit -m "chore: sync contribution data from Kesicode/Kesicode [skip ci]" && git push)

@@ -1,10 +1,11 @@
-name: Update Contributions Data
+name: Update Contributions Data (DEPRECATED)
+
+# This workflow is superseded by sync-contributions.yml which pulls data
+# directly from Kesicode/Kesicode as the single source of truth.
+# Kept here for reference / manual fallback use only.
 
 on:
-  schedule:
-    # Run every 10 minutes — keeps data fresh within ~10 minutes of any push
-    - cron: '*/10 * * * *'
-  workflow_dispatch: # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch: # Manual trigger only — automatic schedule removed
 
 jobs:
   update:

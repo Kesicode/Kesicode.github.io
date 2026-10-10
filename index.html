@@ -436,13 +436,12 @@
         let localDays = null, localTotal = 0;
         const local = localResult.status === "fulfilled" ? localResult.value : null;
         if (local && local.days && local.days.length > 0) {
-          const ageHours = (Date.now() - new Date(local.generated_at).getTime()) / 3600000;
-          if (ageHours < 24) {
-            localDays = local.days
-              .filter(d => d.date && d.date <= today)
-              .sort((a, b) => a.date.localeCompare(b.date));
-            localTotal = local.total_contributions;
-          }
+          // Use local data regardless of age — it's always better than nothing.
+          // The sync workflow keeps it fresh; we never discard valid data.
+          localDays = local.days
+            .filter(d => d.date && d.date <= today)
+            .sort((a, b) => a.date.localeCompare(b.date));
+          localTotal = local.total_contributions;
         }
 
         // Parse jogruber API
@@ -469,9 +468,11 @@
           throw new Error("All sources failed");
         }
 
-        // ── Visual display count for heatmap ──
-        // Days 1-9: seeded random 3-9 for organic visual (avoids boring 4,4,4,4,4)
-        // Days ≥10 or 0: always real count
+        // ── Visual display count for heatmap heat level (colour only) ──
+        // Days 1-9: seeded random 3-9 for organic visual colour variety.
+        // Days ≥10 or 0: always real count.
+        // IMPORTANT: displayCount is used ONLY for the colour level.
+        //            Tooltips and stats always use the real d.count.
         const daysWithDisplay = days.map(d => {
           const displayCount = (d.count >= 1 && d.count <= 9)
             ? seededRand(d.date, 3, 9)
@@ -599,40 +600,59 @@
       const wrap = document.createElement("div");
       wrap.className = "heatmap-wrap";
 
-      // Show last 52 weeks (364 days) ending today — same as GitHub
+      // Show last 52 weeks (364 days) ending today — same as GitHub.
+      // IMPORTANT: all date arithmetic is done in UTC to avoid timezone shifts.
+      // Using new Date(str + 'T00:00:00') and .toISOString() causes a 1-day
+      // backward shift for UTC+ users (e.g. IST), so we use Date.UTC throughout.
       const allDays = DATA.days;
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - 364);
-      const cutoffStr = cutoff.toISOString().slice(0, 10);
-      const days = allDays.filter(d => d.date >= cutoffStr);
 
-      // Build a map for O(1) lookup: date -> count
+      // Helper: add N days to a YYYY-MM-DD string, returns YYYY-MM-DD (UTC)
+      function addDays(dateStr, n) {
+        const [y, m, d] = dateStr.split("-").map(Number);
+        const ms = Date.UTC(y, m - 1, d + n);
+        const dt = new Date(ms);
+        return dt.getUTCFullYear() + "-"
+          + String(dt.getUTCMonth() + 1).padStart(2, "0") + "-"
+          + String(dt.getUTCDate()).padStart(2, "0");
+      }
+
+      // Helper: day-of-week for a YYYY-MM-DD string (0=Sun, 6=Sat), UTC
+      function utcDow(dateStr) {
+        const [y, m, d] = dateStr.split("-").map(Number);
+        return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+      }
+
+      const todayStr   = new Date().toISOString().slice(0, 10); // UTC today
+      const cutoffStr  = addDays(todayStr, -364);               // 365 days incl. today
+      const days       = allDays.filter(d => d.date >= cutoffStr);
+
+      // Build O(1) lookup map
       const dayMap = {};
       days.forEach(d => { dayMap[d.date] = d.count; });
 
-      // Find the Sunday on or before the first day in our window
-      const firstDay = new Date(cutoffStr + "T00:00:00");
-      const startSunday = new Date(firstDay);
-      startSunday.setDate(startSunday.getDate() - startSunday.getDay()); // go back to Sunday
+      // Find Sunday on or before cutoff (go back by day-of-week)
+      const startSundayStr = addDays(cutoffStr, -utcDow(cutoffStr));
 
-      // Find the Saturday on or after today
-      const lastDay = new Date(DATA.range.end + "T00:00:00");
-      const endSaturday = new Date(lastDay);
-      endSaturday.setDate(endSaturday.getDate() + (6 - endSaturday.getDay())); // go forward to Saturday
+      // Find Saturday on or after the data's end date
+      const rangeEnd      = DATA.range.end || todayStr;
+      const endSaturdayStr = addDays(rangeEnd, 6 - utcDow(rangeEnd));
 
-      // Build a week-column array: each column is 7 days Sun-Sat
+      // Build week-column array: each column is 7 days Sun→Sat (pure string arithmetic)
       const cols = [];
-      const cursor = new Date(startSunday);
-      while (cursor <= endSaturday) {
+      let cursorStr = startSundayStr;
+      while (cursorStr <= endSaturdayStr) {
         const col = [];
         for (let dow = 0; dow < 7; dow++) {
-          const dateStr = cursor.toISOString().slice(0, 10);
-          const count = dayMap[dateStr] !== undefined ? dayMap[dateStr] : null; // null = outside range
-          const isFuture = dateStr > DATA.range.end;
-          col.push(isFuture ? null : { date: dateStr, count: count !== null ? count : (dateStr >= cutoffStr ? 0 : null) });
-          cursor.setDate(cursor.getDate() + 1);
+          const dateStr = addDays(cursorStr, dow);
+          const isFuture = dateStr > rangeEnd;
+          const count = dayMap[dateStr] !== undefined ? dayMap[dateStr] : null;
+          col.push(isFuture ? null : {
+            date: dateStr,
+            count: count !== null ? count : (dateStr >= cutoffStr ? 0 : null)
+          });
         }
         cols.push(col);
+        cursorStr = addDays(cursorStr, 7);
       }
 
       // Render grid
@@ -647,7 +667,7 @@
             cell.style.background = "transparent";
             cell.style.cursor = "default";
           } else {
-            // Use displayCount for the color level (visual variety for low-count days)
+            // Use displayCount for the colour level only (visual variety for low-count days)
             const shown = (d.displayCount !== undefined) ? d.displayCount : d.count;
             const lvl = levelFor(shown);
             cell.style.background = PALETTE[lvl];
@@ -655,7 +675,8 @@
               tooltip.style.display = "block";
               tooltip.style.left = e.clientX + 14 + "px";
               tooltip.style.top  = e.clientY + 14 + "px";
-              tooltip.textContent = `${d.date}: ${shown} contribution${shown === 1 ? "" : "s"}`;
+              // Always show the REAL count in the tooltip, not the visual display count
+              tooltip.textContent = `${d.date}: ${d.count} contribution${d.count === 1 ? "" : "s"}`;
             });
             cell.addEventListener("mouseleave", () => { tooltip.style.display = "none"; });
           }
@@ -822,7 +843,15 @@
         runCommand(val);
       }
     });
-    document.addEventListener("click", () => input.focus());
+    document.addEventListener("click", (e) => {
+      // Only focus the input when clicking inside the terminal window,
+      // not on links/buttons, and not when the user is selecting text.
+      const termWindow = document.querySelector(".window");
+      const isInTerminal = termWindow && termWindow.contains(e.target);
+      const isLink = e.target.closest("a, button");
+      const hasSelection = window.getSelection && window.getSelection().toString();
+      if (isInTerminal && !isLink && !hasSelection) input.focus();
+    });
 
     /* ---------------------------------------------------------------------- */
     let matrixOn = false;
