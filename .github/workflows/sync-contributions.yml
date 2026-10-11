@@ -4,6 +4,11 @@ name: Sync contributions from profile repo
 #   1. By a repository_dispatch from Kesicode/Kesicode when profile data updates
 #   2. On a daily cron (safety net in case dispatch was missed)
 #   3. Manually from the GitHub Actions UI
+#
+# Syncs the RICH-SCHEMA contributions.json from Kesicode/Kesicode which includes
+# pre-computed fields: total_contributions, current_streak, longest_streak, best_day,
+# range, active_days — computed server-side with a GraphQL PAT for 100% accuracy.
+# The jogruber third-party API is no longer used (it returned wrong counts).
 
 on:
   repository_dispatch:
