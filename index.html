@@ -412,19 +412,18 @@
       return min + (h % (max - min + 1));
     }
 
-    // ── Auto-refresh every 10 minutes silently in background ──
-    // Picks up new contributions.json as soon as GitHub Actions updates it.
-    setInterval(() => loadData(true), 10 * 60 * 1000);
+    // ── High-frequency background live check ──
+    // Checks for updated contribution data every 5 seconds.
+    // Date.now() ensures every fetch completely bypasses browser and CDN cache.
+    setInterval(() => loadData(true), 5 * 1000);
 
     async function loadData(silent = false) {
       try {
         const today = new Date().toISOString().slice(0, 10);
-        // Cache-buster: force browser/CDN to always fetch the latest file
-        const bust = `?t=${Math.floor(Date.now() / 60000)}`; // changes every minute
+        // Millisecond-precision cache-buster: bypasses browser cache immediately
+        const bust = `?t=${Date.now()}`;
 
         // ── Single source of truth: contributions.json synced from Kesicode/Kesicode ──
-        // The jogruber third-party API has been removed — it returned incorrect counts
-        // (e.g. 1,221 when GitHub shows 1,212). contributions.json is authoritative.
         const resp = await fetch(`./contributions.json${bust}`, { cache: "no-store" });
         if (!resp.ok) throw new Error(`contributions.json fetch failed: ${resp.status}`);
         const local = await resp.json();
