@@ -4,29 +4,44 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Primary SEO -->
   <title>kesi@github ~ interactive terminal</title>
   <meta name="description"
-    content="K S Kashinadh — ECE Undergraduate, IEEE Chairperson, Embedded Systems & AI Builder. Interactive terminal-style GitHub profile with live contribution stats." />
+    content="K S Kashinadh — ECE Undergraduate, IEEE Chairperson, Embedded Systems &amp; AI Builder. Interactive terminal-style GitHub profile with live contribution stats." />
+
+  <!-- Open Graph / Social Preview -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://kesicode.github.io/" />
+  <meta property="og:title"       content="kesi@github ~ interactive terminal" />
+  <meta property="og:description" content="K S Kashinadh — ECE Undergraduate, Embedded Systems &amp; AI Builder. Live GitHub contribution stats." />
+  <meta name="twitter:card"       content="summary" />
+  <meta name="twitter:title"      content="kesi@github ~ interactive terminal" />
+  <meta name="theme-color"        content="#0d1117" />
+
   <style>
+    /* ═══════════════════════════════════════════════════════════
+       1. DESIGN TOKENS
+    ═══════════════════════════════════════════════════════════ */
     :root {
-      --bg: #0d1117;
-      --bg2: #161b22;
-      --frame: #30363d;
-      --muted: #8b949e;
-      --green: #39d353;
+      --bg:        #0d1117;
+      --bg2:       #161b22;
+      --frame:     #30363d;
+      --muted:     #8b949e;
+      --green:     #39d353;
       --green-dim: #146c37;
-      --cyan: #58a6ff;
-      --white: #e6edf3;
-      --red: #ff5f56;
-      --yellow: #ffbd2e;
+      --cyan:      #58a6ff;
+      --white:     #e6edf3;
+      --red:       #ff5f56;
+      --yellow:    #ffbd2e;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    /* ═══════════════════════════════════════════════════════════
+       2. RESET & BASE
+    ═══════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       background: var(--bg);
@@ -46,16 +61,19 @@
       color: var(--cyan);
       text-decoration: none;
     }
+    a:hover { text-decoration: underline; }
 
-    a:hover {
-      text-decoration: underline;
-    }
-
+    /* ═══════════════════════════════════════════════════════════
+       3. LAYOUT WRAPPER
+    ═══════════════════════════════════════════════════════════ */
     .wrap {
       width: 100%;
       max-width: 900px;
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       4. HERO BANNER
+    ═══════════════════════════════════════════════════════════ */
     .hero {
       text-align: center;
       margin-bottom: 22px;
@@ -75,13 +93,9 @@
       font-size: 14px;
     }
 
-    .hero img {
-      width: min(260px, 60vw);
-      border-radius: 10px;
-      border: 1px solid var(--frame);
-      margin-top: 14px;
-    }
-
+    /* ═══════════════════════════════════════════════════════════
+       5. TERMINAL WINDOW
+    ═══════════════════════════════════════════════════════════ */
     .window {
       background: var(--bg);
       border: 1px solid var(--frame);
@@ -90,6 +104,7 @@
       box-shadow: 0 20px 60px -20px rgba(0, 0, 0, .6);
     }
 
+    /* Title bar with traffic-light dots */
     .titlebar {
       display: flex;
       align-items: center;
@@ -108,13 +123,16 @@
 
     .titlebar .label {
       position: absolute;
-      left: 0;
-      right: 0;
+      left: 0; right: 0;
       text-align: center;
       color: var(--muted);
       font-size: 12px;
+      pointer-events: none;
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       6. TERMINAL OUTPUT AREA
+    ═══════════════════════════════════════════════════════════ */
     .term {
       padding: 16px;
       min-height: 360px;
@@ -124,41 +142,21 @@
       line-height: 1.55;
     }
 
-    .term .line {
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
+    .term .line         { white-space: pre-wrap; word-break: break-word; }
+    .term .prompt-line  { display: flex; gap: 8px; }
+    .term .prompt-tag   { color: var(--green); flex-shrink: 0; }
 
-    .term .prompt-line {
-      display: flex;
-      gap: 8px;
-    }
+    /* Output colour helpers */
+    .out-cmd    { color: var(--cyan); }
+    .out-dim    { color: var(--muted); }
+    .out-green  { color: var(--green); }
+    .out-white  { color: var(--white); }
+    .out-yellow { color: var(--yellow); }
+    .out-red    { color: var(--red); }
 
-    .term .prompt-tag {
-      color: var(--green);
-      flex-shrink: 0;
-    }
-
-    .out-cmd {
-      color: var(--cyan);
-    }
-
-    .out-dim {
-      color: var(--muted);
-    }
-
-    .out-green {
-      color: var(--green);
-    }
-
-    .out-white {
-      color: var(--white);
-    }
-
-    .out-yellow {
-      color: var(--yellow);
-    }
-
+    /* ═══════════════════════════════════════════════════════════
+       7. COMMAND INPUT ROW
+    ═══════════════════════════════════════════════════════════ */
     .inputRow {
       display: flex;
       gap: 8px;
@@ -166,9 +164,7 @@
       padding: 0 16px 16px;
     }
 
-    .inputRow .prompt-tag {
-      color: var(--green);
-    }
+    .inputRow .prompt-tag { color: var(--green); }
 
     #cmdInput {
       flex: 1;
@@ -181,6 +177,7 @@
       caret-color: var(--green);
     }
 
+    /* Blinking cursor overlay */
     .cursor {
       display: inline-block;
       width: 8px;
@@ -190,28 +187,11 @@
       vertical-align: middle;
     }
 
-    @keyframes blink {
-      50% {
-        opacity: 0;
-      }
-    }
+    @keyframes blink { 50% { opacity: 0; } }
 
-    .hint {
-      text-align: center;
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 10px;
-    }
-
-    .hint kbd {
-      background: var(--bg2);
-      border: 1px solid var(--frame);
-      border-radius: 4px;
-      padding: 1px 6px;
-      color: var(--white);
-    }
-
-    /* stat cards */
+    /* ═══════════════════════════════════════════════════════════
+       8. STAT CARDS
+    ═══════════════════════════════════════════════════════════ */
     .stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -224,7 +204,9 @@
       border-radius: 8px;
       padding: 12px;
       background: var(--bg2);
+      transition: border-color .2s;
     }
+    .stat:hover { border-color: var(--green-dim); }
 
     .stat .num {
       font-size: 22px;
@@ -240,7 +222,9 @@
       margin-top: 2px;
     }
 
-    /* heatmap */
+    /* ═══════════════════════════════════════════════════════════
+       9. CONTRIBUTION HEATMAP
+    ═══════════════════════════════════════════════════════════ */
     .heatmap-wrap {
       overflow-x: auto;
       padding: 4px 0;
@@ -275,15 +259,12 @@
       margin-top: 8px;
     }
 
-    .legend .cell {
-      cursor: default;
-    }
+    .legend .cell { cursor: default; }
+    .legend .cell:hover { transform: none; outline: none; }
 
-    .legend .cell:hover {
-      transform: none;
-      outline: none;
-    }
-
+    /* ═══════════════════════════════════════════════════════════
+       10. TOOLTIP
+    ═══════════════════════════════════════════════════════════ */
     #tooltip {
       position: fixed;
       pointer-events: none;
@@ -296,6 +277,25 @@
       display: none;
       z-index: 50;
       box-shadow: 0 8px 20px rgba(0, 0, 0, .5);
+      white-space: nowrap;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       11. FOOTER & HINT
+    ═══════════════════════════════════════════════════════════ */
+    .hint {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .hint kbd {
+      background: var(--bg2);
+      border: 1px solid var(--frame);
+      border-radius: 4px;
+      padding: 1px 6px;
+      color: var(--white);
     }
 
     footer {
@@ -305,35 +305,49 @@
       font-size: 12px;
     }
 
-    footer .links {
-      margin-bottom: 8px;
+    footer .links { margin-bottom: 8px; }
+    footer .links a { margin: 0 8px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       12. RESPONSIVE BREAKPOINTS
+    ═══════════════════════════════════════════════════════════ */
+    @media (max-width: 720px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
     }
 
-    footer .links a {
-      margin: 0 8px;
+    @media (max-width: 520px) {
+      .term { font-size: 12.5px; }
+      .hero pre { font-size: 6px; }
+      .stats { grid-template-columns: 1fr 1fr; }
     }
 
-    @media (max-width:520px) {
-      .term {
-        font-size: 12.5px;
-      }
+    /* Live indicator dot */
+    .live-dot {
+      display: inline-block;
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      margin-right: 4px;
+      animation: pulse 2s ease-in-out infinite;
+    }
 
-      .hero pre {
-        font-size: 6px;
-      }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .4; transform: scale(.75); }
     }
   </style>
 </head>
 
 <body>
-
   <div class="wrap">
 
+    <!-- Hero: ASCII Banner -->
     <div class="hero">
       <pre id="bannerArt"></pre>
       <div class="tagline">Hardware Engineer · Software Developer · AI Builder · Entrepreneur</div>
     </div>
 
+    <!-- Terminal Window -->
     <div class="window">
       <div class="titlebar">
         <div class="dot" style="background:var(--red)"></div>
@@ -344,24 +358,29 @@
       <div class="term" id="term"></div>
       <div class="inputRow">
         <span class="prompt-tag">kesi@github:~$</span>
-        <div style="position: relative; flex: 1; display: flex; align-items: center;">
-          <span id="cmdText" style="white-space: pre; font-family: inherit; font-size: 13.5px; color: var(--white);"></span><span class="cursor" id="fakeCursor"></span>
-          <input id="cmdInput" autocomplete="off" autocapitalize="off" spellcheck="false" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: text;" />
+        <div style="position:relative;flex:1;display:flex;align-items:center;">
+          <span id="cmdText" style="white-space:pre;font-family:inherit;font-size:13.5px;color:var(--white);"></span>
+          <span class="cursor" id="fakeCursor"></span>
+          <!-- Hidden real input (opacity:0) — text is mirrored to #cmdText -->
+          <input id="cmdInput" autocomplete="off" autocapitalize="off" spellcheck="false"
+            style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;cursor:text;" />
         </div>
       </div>
     </div>
 
-    <div class="hint">type <kbd>help</kbd> to see commands · try <kbd>contributions</kbd>, <kbd>projects</kbd>, or
-      <kbd>matrix</kbd></div>
+    <div class="hint">
+      type <kbd>help</kbd> to see commands ·
+      try <kbd>contributions</kbd>, <kbd>streak</kbd>, or <kbd>projects</kbd>
+    </div>
 
     <footer>
       <div class="links">
-        <a href="https://kashinadh.com" target="_blank" rel="noopener">portfolio</a>·
-        <a href="https://github.com/Kesicode" target="_blank" rel="noopener">github</a>·
-        <a href="https://linkedin.com/in/k-s-kashinadh" target="_blank" rel="noopener">linkedin</a>·
+        <a href="https://kashinadh.com" target="_blank" rel="noopener noreferrer">portfolio</a>·
+        <a href="https://github.com/Kesicode" target="_blank" rel="noopener noreferrer">github</a>·
+        <a href="https://linkedin.com/in/k-s-kashinadh" target="_blank" rel="noopener noreferrer">linkedin</a>·
         <a href="mailto:kskashinadh4@gmail.com">email</a>
       </div>
-      <div>rendered client-side, no build step · data refreshes daily</div>
+      <div><span class="live-dot"></span>live contribution data · synced from GitHub via GraphQL</div>
     </footer>
 
   </div>
@@ -370,27 +389,374 @@
   <canvas id="matrixCanvas" style="position:fixed;inset:0;z-index:-1;display:none;"></canvas>
 
   <script>
-    /* =========================================================================
-       Fallback contribution data (baked in at build time). If the live fetch to
-       raw.githubusercontent.com fails -- offline, CORS hiccup, whatever -- the
-       page still works and shows real numbers as of the last sync.
-       ========================================================================= */
-    window.__FALLBACK_DATA = { "username": "kesicode", "generated_at": "2026-07-10T08:25:04Z", "range": { "start": "2025-07-06", "end": "2026-07-10" }, "total_contributions": 9467, "active_days": 365, "avg_per_active_day": 25.9, "current_streak": { "length": 61, "start": "2026-05-10", "end": "2026-07-09" }, "longest_streak": { "length": 141, "start": "2025-07-06", "end": "2025-11-23" }, "best_day": { "date": "2026-03-07", "count": 128 }, "monthly": [{ "month": "2025-07", "total": 663 }, { "month": "2025-08", "total": 664 }, { "month": "2025-09", "total": 597 }, { "month": "2025-10", "total": 807 }, { "month": "2025-11", "total": 664 }, { "month": "2025-12", "total": 890 }, { "month": "2026-01", "total": 868 }, { "month": "2026-02", "total": 731 }, { "month": "2026-03", "total": 1270 }, { "month": "2026-04", "total": 776 }, { "month": "2026-05", "total": 782 }, { "month": "2026-06", "total": 585 }, { "month": "2026-07", "total": 170 }], "days": [{ "date": "2025-07-06", "count": 5 }, { "date": "2025-07-07", "count": 30 }, { "date": "2025-07-08", "count": 32 }, { "date": "2025-07-09", "count": 38 }, { "date": "2025-07-10", "count": 34 }, { "date": "2025-07-11", "count": 18 }, { "date": "2025-07-12", "count": 24 }, { "date": "2025-07-13", "count": 22 }, { "date": "2025-07-14", "count": 25 }, { "date": "2025-07-15", "count": 37 }, { "date": "2025-07-16", "count": 24 }, { "date": "2025-07-17", "count": 40 }, { "date": "2025-07-18", "count": 40 }, { "date": "2025-07-19", "count": 10 }, { "date": "2025-07-20", "count": 13 }, { "date": "2025-07-21", "count": 34 }, { "date": "2025-07-22", "count": 36 }, { "date": "2025-07-23", "count": 31 }, { "date": "2025-07-24", "count": 33 }, { "date": "2025-07-25", "count": 33 }, { "date": "2025-07-26", "count": 18 }, { "date": "2025-07-27", "count": 23 }, { "date": "2025-07-28", "count": 16 }, { "date": "2025-07-29", "count": 8 }, { "date": "2025-07-30", "count": 13 }, { "date": "2025-07-31", "count": 26 }, { "date": "2025-08-01", "count": 34 }, { "date": "2025-08-02", "count": 20 }, { "date": "2025-08-03", "count": 23 }, { "date": "2025-08-04", "count": 35 }, { "date": "2025-08-05", "count": 18 }, { "date": "2025-08-06", "count": 14 }, { "date": "2025-08-07", "count": 42 }, { "date": "2025-08-08", "count": 45 }, { "date": "2025-08-09", "count": 19 }, { "date": "2025-08-10", "count": 16 }, { "date": "2025-08-11", "count": 27 }, { "date": "2025-08-12", "count": 31 }, { "date": "2025-08-13", "count": 27 }, { "date": "2025-08-14", "count": 40 }, { "date": "2025-08-15", "count": 1 }, { "date": "2025-08-16", "count": 16 }, { "date": "2025-08-17", "count": 12 }, { "date": "2025-08-18", "count": 4 }, { "date": "2025-08-19", "count": 7 }, { "date": "2025-08-20", "count": 25 }, { "date": "2025-08-21", "count": 29 }, { "date": "2025-08-22", "count": 34 }, { "date": "2025-08-23", "count": 1 }, { "date": "2025-08-24", "count": 17 }, { "date": "2025-08-25", "count": 32 }, { "date": "2025-08-26", "count": 16 }, { "date": "2025-08-27", "count": 29 }, { "date": "2025-08-28", "count": 10 }, { "date": "2025-08-29", "count": 35 }, { "date": "2025-08-30", "count": 3 }, { "date": "2025-08-31", "count": 2 }, { "date": "2025-09-01", "count": 21 }, { "date": "2025-09-02", "count": 32 }, { "date": "2025-09-03", "count": 35 }, { "date": "2025-09-04", "count": 27 }, { "date": "2025-09-05", "count": 13 }, { "date": "2025-09-06", "count": 11 }, { "date": "2025-09-07", "count": 9 }, { "date": "2025-09-08", "count": 22 }, { "date": "2025-09-09", "count": 39 }, { "date": "2025-09-10", "count": 39 }, { "date": "2025-09-11", "count": 26 }, { "date": "2025-09-12", "count": 22 }, { "date": "2025-09-13", "count": 1 }, { "date": "2025-09-14", "count": 1 }, { "date": "2025-09-15", "count": 10 }, { "date": "2025-09-16", "count": 23 }, { "date": "2025-09-17", "count": 35 }, { "date": "2025-09-18", "count": 37 }, { "date": "2025-09-19", "count": 31 }, { "date": "2025-09-20", "count": 8 }, { "date": "2025-09-21", "count": 2 }, { "date": "2025-09-22", "count": 12 }, { "date": "2025-09-23", "count": 16 }, { "date": "2025-09-24", "count": 21 }, { "date": "2025-09-25", "count": 28 }, { "date": "2025-09-26", "count": 13 }, { "date": "2025-09-27", "count": 9 }, { "date": "2025-09-28", "count": 11 }, { "date": "2025-09-29", "count": 20 }, { "date": "2025-09-30", "count": 23 }, { "date": "2025-10-01", "count": 45 }, { "date": "2025-10-02", "count": 3 }, { "date": "2025-10-03", "count": 36 }, { "date": "2025-10-04", "count": 16 }, { "date": "2025-10-05", "count": 8 }, { "date": "2025-10-06", "count": 32 }, { "date": "2025-10-07", "count": 38 }, { "date": "2025-10-08", "count": 40 }, { "date": "2025-10-09", "count": 31 }, { "date": "2025-10-10", "count": 16 }, { "date": "2025-10-11", "count": 10 }, { "date": "2025-10-12", "count": 2 }, { "date": "2025-10-13", "count": 40 }, { "date": "2025-10-14", "count": 35 }, { "date": "2025-10-15", "count": 49 }, { "date": "2025-10-16", "count": 26 }, { "date": "2025-10-17", "count": 17 }, { "date": "2025-10-18", "count": 1 }, { "date": "2025-10-19", "count": 6 }, { "date": "2025-10-20", "count": 2 }, { "date": "2025-10-21", "count": 36 }, { "date": "2025-10-22", "count": 28 }, { "date": "2025-10-23", "count": 29 }, { "date": "2025-10-24", "count": 23 }, { "date": "2025-10-25", "count": 27 }, { "date": "2025-10-26", "count": 16 }, { "date": "2025-10-27", "count": 42 }, { "date": "2025-10-28", "count": 26 }, { "date": "2025-10-29", "count": 40 }, { "date": "2025-10-30", "count": 46 }, { "date": "2025-10-31", "count": 41 }, { "date": "2025-11-01", "count": 3 }, { "date": "2025-11-02", "count": 1 }, { "date": "2025-11-03", "count": 35 }, { "date": "2025-11-04", "count": 45 }, { "date": "2025-11-05", "count": 39 }, { "date": "2025-11-06", "count": 20 }, { "date": "2025-11-07", "count": 36 }, { "date": "2025-11-08", "count": 16 }, { "date": "2025-11-09", "count": 23 }, { "date": "2025-11-10", "count": 38 }, { "date": "2025-11-11", "count": 25 }, { "date": "2025-11-12", "count": 46 }, { "date": "2025-11-13", "count": 43 }, { "date": "2025-11-14", "count": 11 }, { "date": "2025-11-15", "count": 1 }, { "date": "2025-11-16", "count": 1 }, { "date": "2025-11-17", "count": 1 }, { "date": "2025-11-18", "count": 1 }, { "date": "2025-11-19", "count": 30 }, { "date": "2025-11-20", "count": 51 }, { "date": "2025-11-21", "count": 48 }, { "date": "2025-11-22", "count": 59 }, { "date": "2025-11-23", "count": 1 }, { "date": "2025-11-24", "count": 0 }, { "date": "2025-11-25", "count": 2 }, { "date": "2025-11-26", "count": 0 }, { "date": "2025-11-27", "count": 27 }, { "date": "2025-11-28", "count": 40 }, { "date": "2025-11-29", "count": 6 }, { "date": "2025-11-30", "count": 15 }, { "date": "2025-12-01", "count": 46 }, { "date": "2025-12-02", "count": 32 }, { "date": "2025-12-03", "count": 48 }, { "date": "2025-12-04", "count": 47 }, { "date": "2025-12-05", "count": 31 }, { "date": "2025-12-06", "count": 5 }, { "date": "2025-12-07", "count": 3 }, { "date": "2025-12-08", "count": 46 }, { "date": "2025-12-09", "count": 29 }, { "date": "2025-12-10", "count": 32 }, { "date": "2025-12-11", "count": 64 }, { "date": "2025-12-12", "count": 35 }, { "date": "2025-12-13", "count": 18 }, { "date": "2025-12-14", "count": 2 }, { "date": "2025-12-15", "count": 42 }, { "date": "2025-12-16", "count": 32 }, { "date": "2025-12-17", "count": 56 }, { "date": "2025-12-18", "count": 58 }, { "date": "2025-12-19", "count": 27 }, { "date": "2025-12-20", "count": 8 }, { "date": "2025-12-21", "count": 1 }, { "date": "2025-12-22", "count": 53 }, { "date": "2025-12-23", "count": 50 }, { "date": "2025-12-24", "count": 4 }, { "date": "2025-12-25", "count": 4 }, { "date": "2025-12-26", "count": 2 }, { "date": "2025-12-27", "count": 8 }, { "date": "2025-12-28", "count": 8 }, { "date": "2025-12-29", "count": 55 }, { "date": "2025-12-30", "count": 41 }, { "date": "2025-12-31", "count": 3 }, { "date": "2026-01-01", "count": 39 }, { "date": "2026-01-02", "count": 35 }, { "date": "2026-01-03", "count": 12 }, { "date": "2026-01-04", "count": 38 }, { "date": "2026-01-05", "count": 28 }, { "date": "2026-01-06", "count": 70 }, { "date": "2026-01-07", "count": 53 }, { "date": "2026-01-08", "count": 68 }, { "date": "2026-01-09", "count": 34 }, { "date": "2026-01-10", "count": 4 }, { "date": "2026-01-11", "count": 0 }, { "date": "2026-01-12", "count": 38 }, { "date": "2026-01-13", "count": 62 }, { "date": "2026-01-14", "count": 21 }, { "date": "2026-01-15", "count": 24 }, { "date": "2026-01-16", "count": 15 }, { "date": "2026-01-17", "count": 26 }, { "date": "2026-01-18", "count": 3 }, { "date": "2026-01-19", "count": 10 }, { "date": "2026-01-20", "count": 31 }, { "date": "2026-01-21", "count": 30 }, { "date": "2026-01-22", "count": 32 }, { "date": "2026-01-23", "count": 23 }, { "date": "2026-01-24", "count": 14 }, { "date": "2026-01-25", "count": 8 }, { "date": "2026-01-26", "count": 22 }, { "date": "2026-01-27", "count": 28 }, { "date": "2026-01-28", "count": 40 }, { "date": "2026-01-29", "count": 27 }, { "date": "2026-01-30", "count": 29 }, { "date": "2026-01-31", "count": 4 }, { "date": "2026-02-01", "count": 11 }, { "date": "2026-02-02", "count": 21 }, { "date": "2026-02-03", "count": 27 }, { "date": "2026-02-04", "count": 13 }, { "date": "2026-02-05", "count": 15 }, { "date": "2026-02-06", "count": 1 }, { "date": "2026-02-07", "count": 1 }, { "date": "2026-02-08", "count": 1 }, { "date": "2026-02-09", "count": 1 }, { "date": "2026-02-10", "count": 1 }, { "date": "2026-02-11", "count": 29 }, { "date": "2026-02-12", "count": 49 }, { "date": "2026-02-13", "count": 27 }, { "date": "2026-02-14", "count": 7 }, { "date": "2026-02-15", "count": 10 }, { "date": "2026-02-16", "count": 12 }, { "date": "2026-02-17", "count": 17 }, { "date": "2026-02-18", "count": 48 }, { "date": "2026-02-19", "count": 43 }, { "date": "2026-02-20", "count": 19 }, { "date": "2026-02-21", "count": 35 }, { "date": "2026-02-22", "count": 32 }, { "date": "2026-02-23", "count": 63 }, { "date": "2026-02-24", "count": 58 }, { "date": "2026-02-25", "count": 58 }, { "date": "2026-02-26", "count": 69 }, { "date": "2026-02-27", "count": 31 }, { "date": "2026-02-28", "count": 32 }, { "date": "2026-03-01", "count": 7 }, { "date": "2026-03-02", "count": 24 }, { "date": "2026-03-03", "count": 42 }, { "date": "2026-03-04", "count": 18 }, { "date": "2026-03-05", "count": 3 }, { "date": "2026-03-06", "count": 32 }, { "date": "2026-03-07", "count": 128 }, { "date": "2026-03-08", "count": 4 }, { "date": "2026-03-09", "count": 76 }, { "date": "2026-03-10", "count": 76 }, { "date": "2026-03-11", "count": 48 }, { "date": "2026-03-12", "count": 60 }, { "date": "2026-03-13", "count": 53 }, { "date": "2026-03-14", "count": 36 }, { "date": "2026-03-15", "count": 19 }, { "date": "2026-03-16", "count": 53 }, { "date": "2026-03-17", "count": 41 }, { "date": "2026-03-18", "count": 40 }, { "date": "2026-03-19", "count": 53 }, { "date": "2026-03-20", "count": 61 }, { "date": "2026-03-21", "count": 5 }, { "date": "2026-03-22", "count": 32 }, { "date": "2026-03-23", "count": 58 }, { "date": "2026-03-24", "count": 78 }, { "date": "2026-03-25", "count": 43 }, { "date": "2026-03-26", "count": 62 }, { "date": "2026-03-27", "count": 64 }, { "date": "2026-03-28", "count": 8 }, { "date": "2026-03-29", "count": 2 }, { "date": "2026-03-30", "count": 26 }, { "date": "2026-03-31", "count": 18 }, { "date": "2026-04-01", "count": 2 }, { "date": "2026-04-02", "count": 34 }, { "date": "2026-04-03", "count": 38 }, { "date": "2026-04-04", "count": 1 }, { "date": "2026-04-05", "count": 2 }, { "date": "2026-04-06", "count": 42 }, { "date": "2026-04-07", "count": 50 }, { "date": "2026-04-08", "count": 36 }, { "date": "2026-04-09", "count": 55 }, { "date": "2026-04-10", "count": 59 }, { "date": "2026-04-11", "count": 30 }, { "date": "2026-04-12", "count": 30 }, { "date": "2026-04-13", "count": 43 }, { "date": "2026-04-14", "count": 20 }, { "date": "2026-04-15", "count": 47 }, { "date": "2026-04-16", "count": 25 }, { "date": "2026-04-17", "count": 39 }, { "date": "2026-04-18", "count": 6 }, { "date": "2026-04-19", "count": 2 }, { "date": "2026-04-20", "count": 23 }, { "date": "2026-04-21", "count": 21 }, { "date": "2026-04-22", "count": 17 }, { "date": "2026-04-23", "count": 19 }, { "date": "2026-04-24", "count": 9 }, { "date": "2026-04-25", "count": 13 }, { "date": "2026-04-26", "count": 7 }, { "date": "2026-04-27", "count": 25 }, { "date": "2026-04-28", "count": 24 }, { "date": "2026-04-29", "count": 26 }, { "date": "2026-04-30", "count": 31 }, { "date": "2026-05-01", "count": 21 }, { "date": "2026-05-02", "count": 11 }, { "date": "2026-05-03", "count": 11 }, { "date": "2026-05-04", "count": 60 }, { "date": "2026-05-05", "count": 6 }, { "date": "2026-05-06", "count": 38 }, { "date": "2026-05-07", "count": 7 }, { "date": "2026-05-08", "count": 13 }, { "date": "2026-05-09", "count": 0 }, { "date": "2026-05-10", "count": 5 }, { "date": "2026-05-11", "count": 37 }, { "date": "2026-05-12", "count": 24 }, { "date": "2026-05-13", "count": 7 }, { "date": "2026-05-14", "count": 20 }, { "date": "2026-05-15", "count": 25 }, { "date": "2026-05-16", "count": 19 }, { "date": "2026-05-17", "count": 10 }, { "date": "2026-05-18", "count": 29 }, { "date": "2026-05-19", "count": 8 }, { "date": "2026-05-20", "count": 33 }, { "date": "2026-05-21", "count": 31 }, { "date": "2026-05-22", "count": 31 }, { "date": "2026-05-23", "count": 32 }, { "date": "2026-05-24", "count": 19 }, { "date": "2026-05-25", "count": 22 }, { "date": "2026-05-26", "count": 20 }, { "date": "2026-05-27", "count": 49 }, { "date": "2026-05-28", "count": 81 }, { "date": "2026-05-29", "count": 52 }, { "date": "2026-05-30", "count": 20 }, { "date": "2026-05-31", "count": 41 }, { "date": "2026-06-01", "count": 35 }, { "date": "2026-06-02", "count": 12 }, { "date": "2026-06-03", "count": 21 }, { "date": "2026-06-04", "count": 38 }, { "date": "2026-06-05", "count": 12 }, { "date": "2026-06-06", "count": 1 }, { "date": "2026-06-07", "count": 6 }, { "date": "2026-06-08", "count": 6 }, { "date": "2026-06-09", "count": 41 }, { "date": "2026-06-10", "count": 49 }, { "date": "2026-06-11", "count": 23 }, { "date": "2026-06-12", "count": 64 }, { "date": "2026-06-13", "count": 10 }, { "date": "2026-06-14", "count": 16 }, { "date": "2026-06-15", "count": 25 }, { "date": "2026-06-16", "count": 14 }, { "date": "2026-06-17", "count": 33 }, { "date": "2026-06-18", "count": 23 }, { "date": "2026-06-19", "count": 40 }, { "date": "2026-06-20", "count": 10 }, { "date": "2026-06-21", "count": 1 }, { "date": "2026-06-22", "count": 19 }, { "date": "2026-06-23", "count": 16 }, { "date": "2026-06-24", "count": 13 }, { "date": "2026-06-25", "count": 19 }, { "date": "2026-06-26", "count": 7 }, { "date": "2026-06-27", "count": 4 }, { "date": "2026-06-28", "count": 2 }, { "date": "2026-06-29", "count": 15 }, { "date": "2026-06-30", "count": 10 }, { "date": "2026-07-01", "count": 25 }, { "date": "2026-07-02", "count": 48 }, { "date": "2026-07-03", "count": 7 }, { "date": "2026-07-04", "count": 8 }, { "date": "2026-07-05", "count": 2 }, { "date": "2026-07-06", "count": 23 }, { "date": "2026-07-07", "count": 10 }, { "date": "2026-07-08", "count": 23 }, { "date": "2026-07-09", "count": 24 }, { "date": "2026-07-10", "count": 0 }] };
+    /* ═══════════════════════════════════════════════════════════════════════════
+       KESICODE.GITHUB.IO — Terminal Portfolio
+       Architecture:
+         1. CONSTANTS & GLOBALS
+         2. UTILITY FUNCTIONS
+         3. DATA LAYER  (loadData, renderStats, countUp)
+         4. HEATMAP     (levelFor, buildHeatmapEl)
+         5. COMMANDS    (all terminal commands)
+         6. INPUT       (keyboard, click-focus, history)
+         7. MATRIX      (canvas animation)
+         8. BOOT        (initialisation)
+    ═══════════════════════════════════════════════════════════════════════════ */
 
-    // LIVE_DATA_URL removed — now fetching directly from jogruber API
+    /* ── 1. CONSTANTS & GLOBALS ─────────────────────────────────────────────── */
 
     const BANNER = String.raw`    __ __ ___   _____ __  _______   _____    ____  __  __
    / //_//   | / ___// / / /  _/ | / /   |  / __ \/ / / /
-  / ,<  / /| | \__ \/ /_/ // //  |/ / /| | / / / / /_/ / 
+  / ,< / /| | \__ \/ /_/ // //  |/ / /| | / / / / /_/ / 
  / /| |/ ___ |___/ / __  // // /|  / ___ |/ /_/ / __  /  
 /_/ |_/_/  |_/____/_/ /_/___/_/ |_/_/  |_/_____/_/ /_/   `;
-    document.getElementById("bannerArt").textContent = BANNER;
 
-    /* ---------------------------------------------------------------------- */
-    const term = document.getElementById("term");
-    const input = document.getElementById("cmdInput");
-    const tooltip = document.getElementById("tooltip");
+    // Heatmap colour palette (0 = empty, 5 = max)
+    const PALETTE = ["transparent", "#0e4429", "#146c37", "#26a648", "#39d353", "#7cf2a0"];
 
+    // Global data object — populated by loadData()
+    let DATA = null;
+
+    // Command history for ↑/↓ navigation
+    const cmdHistory = [];
+    let historyIndex = -1;
+
+    // Debug hook
+    window.__getData = () => DATA;
+
+    /* ── 2. UTILITY FUNCTIONS ───────────────────────────────────────────────── */
+
+    /** Add N days to a YYYY-MM-DD string, returns YYYY-MM-DD (all UTC — no timezone shift). */
+    function addDays(dateStr, n) {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      const ms = Date.UTC(y, m - 1, d + n);
+      const dt = new Date(ms);
+      return dt.getUTCFullYear() + "-"
+        + String(dt.getUTCMonth() + 1).padStart(2, "0") + "-"
+        + String(dt.getUTCDate()).padStart(2, "0");
+    }
+
+    /** Day-of-week for a YYYY-MM-DD string (0=Sun, 6=Sat), UTC. */
+    function utcDow(dateStr) {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+    }
+
+    /** Seeded deterministic pseudo-random — same date → same value (no re-render flicker). */
+    function seededRand(dateStr, min, max) {
+      let h = 0;
+      for (let i = 0; i < dateStr.length; i++) h = Math.imul(31, h) + dateStr.charCodeAt(i) | 0;
+      h = Math.abs(h);
+      return min + (h % (max - min + 1));
+    }
+
+    /** Escape HTML to prevent XSS in terminal output. */
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, c =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+      );
+    }
+
+    /* ── 3. DATA LAYER ──────────────────────────────────────────────────────── */
+
+    /**
+     * Fetch contributions.json (single source of truth — synced hourly from
+     * Kesicode/Kesicode via GraphQL PAT). On failure keeps the last good DATA.
+     *
+     * @param {boolean} silent  If true (background poll), skip full re-render
+     *                          unless numbers actually changed.
+     */
+    async function loadData(silent = false) {
+      try {
+        const today = new Date().toISOString().slice(0, 10);
+
+        // Millisecond timestamp busts browser cache; GitHub Pages CDN has a
+        // 10-minute TTL so the real data cadence is "within 10 minutes of a push".
+        const bust = `?t=${Date.now()}`;
+        const resp = await fetch(`./contributions.json${bust}`, { cache: "no-store" });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const raw = await resp.json();
+
+        if (!raw || !Array.isArray(raw.days) || raw.days.length === 0) {
+          throw new Error("contributions.json is empty or schema mismatch");
+        }
+
+        // Filter future dates; sort ascending
+        const days = raw.days
+          .filter(d => d.date && d.date <= today)
+          .sort((a, b) => a.date.localeCompare(b.date));
+
+        // Visual-only display count (colour heat level for low-count days).
+        // This avoids a boring flat green tone when real counts are 1–9.
+        // NOTE: tooltips and stats cards ALWAYS use d.count (real value).
+        const daysWithDisplay = days.map(d => ({
+          date: d.date,
+          count: d.count,
+          displayCount: (d.count >= 1 && d.count <= 9)
+            ? seededRand(d.date, 3, 9)
+            : d.count,
+        }));
+
+        // ── Use pre-computed server-side stats when present (most accurate) ──
+        // Fallback: recompute locally only when the field is missing.
+        const totalContributions = raw.total_contributions;
+
+        const current_streak = raw.current_streak?.length !== undefined
+          ? raw.current_streak
+          : computeCurrentStreak(daysWithDisplay);
+
+        const longest_streak = raw.longest_streak?.length !== undefined
+          ? raw.longest_streak
+          : computeLongestStreak(daysWithDisplay);
+
+        const best_day = raw.best_day?.count !== undefined
+          ? raw.best_day
+          : computeBestDay(daysWithDisplay);
+
+        const active_days = raw.active_days
+          ?? daysWithDisplay.filter(d => d.count > 0).length;
+
+        DATA = {
+          username:           "Kesicode",
+          generated_at:       raw.generated_at || "",
+          total_contributions: totalContributions,
+          range:              raw.range || {
+            start: daysWithDisplay[0]?.date || "",
+            end:   daysWithDisplay[daysWithDisplay.length - 1]?.date || "",
+          },
+          active_days,
+          avg_per_active_day: raw.avg_per_active_day
+            ?? (active_days ? +(totalContributions / active_days).toFixed(1) : 0),
+          best_day,
+          current_streak,
+          longest_streak,
+          monthly: raw.monthly || [],
+          days:    daysWithDisplay,
+          source:  "live",
+        };
+
+      } catch (err) {
+        // On first load, no DATA yet — this stops the site from being blank.
+        // On background polls, keep showing the last successfully fetched data.
+        if (!DATA) {
+          console.warn("loadData: fetch failed on first load:", err);
+          DATA = null; // renderStats will show nothing until retry
+        } else {
+          console.warn("loadData: background refresh failed (keeping last data):", err);
+        }
+      }
+
+      renderStats();
+    }
+
+    // ── Streak / best-day fallback computations (used only when JSON lacks fields) ──
+
+    function computeCurrentStreak(days) {
+      let len = 0, start = "", end = "";
+      let i = days.length - 1;
+      if (i >= 0 && days[i].count === 0) i--; // skip today if zero
+      while (i >= 0 && days[i].count > 0) {
+        if (len === 0) end = days[i].date;
+        start = days[i].date;
+        len++;
+        i--;
+      }
+      return { length: len, start, end };
+    }
+
+    function computeLongestStreak(days) {
+      let best = { length: 0, start: "", end: "" };
+      let temp = { length: 0, start: "", end: "" };
+      days.forEach(d => {
+        if (d.count > 0) {
+          if (temp.length === 0) temp.start = d.date;
+          temp.length++;
+          temp.end = d.date;
+          if (temp.length > best.length) best = { ...temp };
+        } else {
+          temp = { length: 0, start: "", end: "" };
+        }
+      });
+      return best;
+    }
+
+    function computeBestDay(days) {
+      return days.reduce((best, d) =>
+        d.count > best.count ? { date: d.date, count: d.count } : best,
+        { date: "", count: 0 }
+      );
+    }
+
+    /** Animated number counter (cubic ease-out, ~900ms). */
+    function countUp(el, from, to) {
+      const DURATION = 900;
+      const start = performance.now();
+      function tick(now) {
+        const p    = Math.min(1, (now - start) / DURATION);
+        const ease = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(from + (to - from) * ease).toLocaleString();
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    /**
+     * Render (or update) the four stat cards.
+     * On first render: builds DOM from scratch.
+     * On subsequent calls (silent background refresh): only animates changed values.
+     */
+    function renderStats() {
+      if (!DATA) return;
+      const box = document.getElementById("statsBox");
+      if (!box) return;
+
+      const stats = [
+        ["total",   DATA.total_contributions,   "contributions"],
+        ["current", DATA.current_streak.length, "day streak"],
+        ["longest", DATA.longest_streak.length, "day best streak"],
+        ["best",    DATA.best_day.count,         "in one day"],
+      ];
+
+      const existingNums = box.querySelectorAll(".num[data-key]");
+      if (existingNums.length === stats.length) {
+        // Incremental update — only animate values that changed
+        stats.forEach(([key, val]) => {
+          const el = box.querySelector(`.num[data-key="${key}"]`);
+          if (!el) return;
+          const current = parseInt(el.textContent.replace(/,/g, ""), 10) || 0;
+          if (current !== val) countUp(el, current, val);
+        });
+        return;
+      }
+
+      // First render — build all four cards
+      box.innerHTML = "";
+      stats.forEach(([key, val, label]) => {
+        const card = document.createElement("div");
+        card.className = "stat";
+        card.innerHTML =
+          `<div class="num" data-key="${key}">0</div>` +
+          `<div class="lbl">${label}</div>`;
+        box.appendChild(card);
+        countUp(card.querySelector(".num"), 0, val);
+      });
+    }
+
+    // ── Background live-polling ──────────────────────────────────────────────
+    // GitHub Pages CDN caches files for ~10 minutes, so effective update
+    // cadence is 10 min after a push. We poll every 30s so we catch it soon.
+    // Millisecond cache-buster prevents browser/service-worker caching.
+    setInterval(() => loadData(true), 30 * 1000);
+
+    /* ── 4. HEATMAP ─────────────────────────────────────────────────────────── */
+
+    /** Map a contribution count to palette level 0–5. */
+    function levelFor(count) {
+      if (count === 0)   return 0;
+      if (count <= 5)    return 1;
+      if (count <= 15)   return 2;
+      if (count <= 30)   return 3;
+      if (count <= 50)   return 4;
+      return 5;
+    }
+
+    /**
+     * Build and return the full heatmap DOM element.
+     * Uses pure UTC date arithmetic — no timezone shift bugs.
+     */
+    function buildHeatmapEl() {
+      const wrap = document.createElement("div");
+      wrap.className = "heatmap-wrap";
+
+      const todayStr      = new Date().toISOString().slice(0, 10);
+      const cutoffStr     = addDays(todayStr, -364);              // 365-day window
+      const rangeEnd      = DATA.range.end || todayStr;
+
+      // Filter to window, build O(1) lookup
+      const dayMap = {};
+      DATA.days
+        .filter(d => d.date >= cutoffStr)
+        .forEach(d => { dayMap[d.date] = d; });
+
+      // Align to week boundaries (Sun→Sat grid like GitHub)
+      const startSundayStr  = addDays(cutoffStr, -utcDow(cutoffStr));
+      const endSaturdayStr  = addDays(rangeEnd, 6 - utcDow(rangeEnd));
+
+      // Build column array
+      const cols = [];
+      let cursorStr = startSundayStr;
+      while (cursorStr <= endSaturdayStr) {
+        const col = [];
+        for (let dow = 0; dow < 7; dow++) {
+          const dateStr  = addDays(cursorStr, dow);
+          const isFuture = dateStr > rangeEnd;
+          const entry    = dayMap[dateStr];
+          col.push(isFuture ? null : {
+            date:         dateStr,
+            count:        entry ? entry.count        : (dateStr >= cutoffStr ? 0 : null),
+            displayCount: entry ? entry.displayCount  : 0,
+          });
+        }
+        cols.push(col);
+        cursorStr = addDays(cursorStr, 7);
+      }
+
+      // Render grid
+      const tooltip = document.getElementById("tooltip");
+      const grid    = document.createElement("div");
+      grid.className = "heatmap";
+
+      cols.forEach(col => {
+        col.forEach(d => {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+
+          if (!d || d.count === null) {
+            // Out-of-window or future cell — invisible
+            cell.style.background = "transparent";
+            cell.style.cursor     = "default";
+          } else {
+            // Colour level uses displayCount (organic visual variety for low counts)
+            const lvl = levelFor(d.displayCount);
+            cell.style.background = PALETTE[lvl];
+
+            // Tooltip always shows REAL count
+            cell.addEventListener("mousemove", e => {
+              tooltip.style.display = "block";
+              tooltip.style.left    = e.clientX + 14 + "px";
+              tooltip.style.top     = e.clientY + 14 + "px";
+              tooltip.textContent   =
+                `${d.date}: ${d.count} contribution${d.count === 1 ? "" : "s"}`;
+            });
+            cell.addEventListener("mouseleave", () => {
+              tooltip.style.display = "none";
+            });
+          }
+          grid.appendChild(cell);
+        });
+      });
+
+      wrap.appendChild(grid);
+
+      // Legend
+      const legend = document.createElement("div");
+      legend.className = "legend";
+      legend.innerHTML = "less ";
+      PALETTE.forEach(c => {
+        legend.innerHTML +=
+          `<span class="cell" style="background:${c === "transparent" ? "#1c2128" : c}"></span> `;
+      });
+      legend.innerHTML += " more";
+      wrap.appendChild(legend);
+
+      return wrap;
+    }
+
+    /* ── 5. COMMANDS ────────────────────────────────────────────────────────── */
+
+    const term    = document.getElementById("term");
+    const input   = document.getElementById("cmdInput");
+
+    /** Append an HTML line to the terminal output. */
     function line(html, cls) {
       const div = document.createElement("div");
       div.className = "line" + (cls ? " " + cls : "");
@@ -399,315 +765,31 @@
       term.scrollTop = term.scrollHeight;
       return div;
     }
+
+    /** Append a blank line. */
     function blank() { line("&nbsp;"); }
 
-    let DATA = null;
-    window.__getData = () => DATA; // test/debug hook
-
-    // Seeded random: same date always → same display number (no flicker on re-render)
-    function seededRand(dateStr, min, max) {
-      let h = 0;
-      for (let i = 0; i < dateStr.length; i++) h = Math.imul(31, h) + dateStr.charCodeAt(i) | 0;
-      h = Math.abs(h);
-      return min + (h % (max - min + 1));
-    }
-
-    // ── High-frequency background live check ──
-    // Checks for updated contribution data every 5 seconds.
-    // Date.now() ensures every fetch completely bypasses browser and CDN cache.
-    setInterval(() => loadData(true), 5 * 1000);
-
-    async function loadData(silent = false) {
-      try {
-        const today = new Date().toISOString().slice(0, 10);
-        // Millisecond-precision cache-buster: bypasses browser cache immediately
-        const bust = `?t=${Date.now()}`;
-
-        // ── Single source of truth: contributions.json synced from Kesicode/Kesicode ──
-        const resp = await fetch(`./contributions.json${bust}`, { cache: "no-store" });
-        if (!resp.ok) throw new Error(`contributions.json fetch failed: ${resp.status}`);
-        const local = await resp.json();
-
-        if (!local || !local.days || local.days.length === 0) {
-          throw new Error("contributions.json is empty or malformed");
-        }
-
-        // Filter to dates <= today (no future dates)
-        const days = local.days
-          .filter(d => d.date && d.date <= today)
-          .sort((a, b) => a.date.localeCompare(b.date));
-
-        // ── Visual display count for heatmap heat level (colour only) ──
-        // Days 1-9: seeded random 3-9 for organic visual colour variety.
-        // Days ≥10 or 0: always real count.
-        // IMPORTANT: displayCount is used ONLY for the colour level.
-        //            Tooltips and stats always use the real d.count.
-        const daysWithDisplay = days.map(d => {
-          const displayCount = (d.count >= 1 && d.count <= 9)
-            ? seededRand(d.date, 3, 9)
-            : d.count;
-          return { date: d.date, count: d.count, displayCount };
-        });
-
-        // ── Use pre-computed stats from contributions.json when available ──
-        // These are computed server-side with GraphQL PAT data — more accurate
-        // than re-computing on the client from a potentially partial day list.
-        const totalContributions = local.total_contributions;
-
-        // Streak: trust pre-computed values if present; recompute only as fallback
-        let current_streak, longest_streak, best_day;
-
-        if (local.current_streak && local.current_streak.length !== undefined) {
-          current_streak = local.current_streak;
-        } else {
-          // Fallback: recompute from day list
-          let currLen = 0, currStart = "", currEnd = "";
-          let i = daysWithDisplay.length - 1;
-          if (i >= 0 && daysWithDisplay[i].count === 0) i--;
-          while (i >= 0 && daysWithDisplay[i].count > 0) {
-            if (currLen === 0) currEnd = daysWithDisplay[i].date;
-            currStart = daysWithDisplay[i].date;
-            currLen++;
-            i--;
-          }
-          current_streak = { length: currLen, start: currStart, end: currEnd };
-        }
-
-        if (local.longest_streak && local.longest_streak.length !== undefined) {
-          longest_streak = local.longest_streak;
-        } else {
-          // Fallback: recompute from day list
-          let ls = { length: 0, start: "", end: "" };
-          let temp = { length: 0, start: "", end: "" };
-          daysWithDisplay.forEach(d => {
-            if (d.count > 0) {
-              if (temp.length === 0) temp.start = d.date;
-              temp.length++;
-              temp.end = d.date;
-              if (temp.length > ls.length) ls = { ...temp };
-            } else {
-              temp = { length: 0, start: "", end: "" };
-            }
-          });
-          longest_streak = ls;
-        }
-
-        if (local.best_day && local.best_day.count !== undefined) {
-          best_day = local.best_day;
-        } else {
-          // Fallback: recompute from day list
-          best_day = { date: "", count: 0 };
-          daysWithDisplay.forEach(d => {
-            if (d.count > best_day.count) best_day = { date: d.date, count: d.count };
-          });
-        }
-
-        const active_days = local.active_days
-          || daysWithDisplay.filter(d => d.count > 0).length;
-
-        DATA = {
-          username: "Kesicode",
-          total_contributions: totalContributions,
-          range: local.range || {
-            start: daysWithDisplay[0]?.date || "",
-            end: daysWithDisplay[daysWithDisplay.length - 1]?.date || ""
-          },
-          active_days,
-          avg_per_active_day: local.avg_per_active_day
-            || (active_days ? +(totalContributions / active_days).toFixed(1) : 0),
-          best_day,
-          current_streak,
-          longest_streak,
-          days: daysWithDisplay,
-          source: "local",
-        };
-
-      } catch (e) {
-        console.error("Failed to load contribution data:", e);
-        if (!DATA) DATA = window.__FALLBACK_DATA; // only use fallback on first load
-      }
-      renderStats();
-    }
-
-    /* ---------------------------------------------------------------------- */
-    function countUp(el, from, to) {
-      const dur = 900;
-      const start = performance.now();
-      function tick(now) {
-        const p = Math.min(1, (now - start) / dur);
-        const ease = 1 - Math.pow(1 - p, 3);
-        el.textContent = Math.round(from + (to - from) * ease).toLocaleString();
-        if (p < 1) requestAnimationFrame(tick);
-      }
-      requestAnimationFrame(tick);
-    }
-
-    function renderStats() {
-      if (!DATA) return;
-      const box = document.getElementById("statsBox");
-      if (!box) return;
-      const stats = [
-        ["total",   DATA.total_contributions,    "contributions"],
-        ["current", DATA.current_streak.length,  "day streak"],
-        ["longest", DATA.longest_streak.length,  "day best streak"],
-        ["best",    DATA.best_day.count,          "in one day"],
-      ];
-
-      // If cards already exist, only animate numbers that changed (silent refresh)
-      const existingNums = box.querySelectorAll(".num[data-key]");
-      if (existingNums.length === stats.length) {
-        stats.forEach(([key, val]) => {
-          const el = box.querySelector(`.num[data-key="${key}"]`);
-          if (el) {
-            const current = parseInt(el.textContent.replace(/,/g, ""), 10) || 0;
-            if (current !== val) countUp(el, current, val); // animate change
-          }
-        });
-        return;
-      }
-
-      // First load: build cards from scratch
-      box.innerHTML = "";
-      stats.forEach(([key, val, label]) => {
-        const card = document.createElement("div");
-        card.className = "stat";
-        card.innerHTML = `<div class="num" data-key="${key}">0</div><div class="lbl">${label}</div>`;
-        box.appendChild(card);
-        countUp(card.querySelector(".num"), 0, val);
-      });
-    }
-
-    /* ---------------------------------------------------------------------- */
-    function levelFor(count) {
-      if (count === 0) return 0;
-      if (count <= 5) return 1;
-      if (count <= 15) return 2;
-      if (count <= 30) return 3;
-      if (count <= 50) return 4;
-      return 5;
-    }
-    const PALETTE = ["#1c2128", "#0e4429", "#146c37", "#26a648", "#39d353", "#7cf2a0"];
-
-    function buildHeatmapEl() {
-      const wrap = document.createElement("div");
-      wrap.className = "heatmap-wrap";
-
-      // Show last 52 weeks (364 days) ending today — same as GitHub.
-      // IMPORTANT: all date arithmetic is done in UTC to avoid timezone shifts.
-      // Using new Date(str + 'T00:00:00') and .toISOString() causes a 1-day
-      // backward shift for UTC+ users (e.g. IST), so we use Date.UTC throughout.
-      const allDays = DATA.days;
-
-      // Helper: add N days to a YYYY-MM-DD string, returns YYYY-MM-DD (UTC)
-      function addDays(dateStr, n) {
-        const [y, m, d] = dateStr.split("-").map(Number);
-        const ms = Date.UTC(y, m - 1, d + n);
-        const dt = new Date(ms);
-        return dt.getUTCFullYear() + "-"
-          + String(dt.getUTCMonth() + 1).padStart(2, "0") + "-"
-          + String(dt.getUTCDate()).padStart(2, "0");
-      }
-
-      // Helper: day-of-week for a YYYY-MM-DD string (0=Sun, 6=Sat), UTC
-      function utcDow(dateStr) {
-        const [y, m, d] = dateStr.split("-").map(Number);
-        return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
-      }
-
-      const todayStr   = new Date().toISOString().slice(0, 10); // UTC today
-      const cutoffStr  = addDays(todayStr, -364);               // 365 days incl. today
-      const days       = allDays.filter(d => d.date >= cutoffStr);
-
-      // Build O(1) lookup map
-      const dayMap = {};
-      days.forEach(d => { dayMap[d.date] = d.count; });
-
-      // Find Sunday on or before cutoff (go back by day-of-week)
-      const startSundayStr = addDays(cutoffStr, -utcDow(cutoffStr));
-
-      // Find Saturday on or after the data's end date
-      const rangeEnd      = DATA.range.end || todayStr;
-      const endSaturdayStr = addDays(rangeEnd, 6 - utcDow(rangeEnd));
-
-      // Build week-column array: each column is 7 days Sun→Sat (pure string arithmetic)
-      const cols = [];
-      let cursorStr = startSundayStr;
-      while (cursorStr <= endSaturdayStr) {
-        const col = [];
-        for (let dow = 0; dow < 7; dow++) {
-          const dateStr = addDays(cursorStr, dow);
-          const isFuture = dateStr > rangeEnd;
-          const count = dayMap[dateStr] !== undefined ? dayMap[dateStr] : null;
-          col.push(isFuture ? null : {
-            date: dateStr,
-            count: count !== null ? count : (dateStr >= cutoffStr ? 0 : null)
-          });
-        }
-        cols.push(col);
-        cursorStr = addDays(cursorStr, 7);
-      }
-
-      // Render grid
-      const grid = document.createElement("div");
-      grid.className = "heatmap";
-
-      cols.forEach(col => {
-        col.forEach(d => {
-          const cell = document.createElement("div");
-          cell.className = "cell";
-          if (!d || d.count === null) {
-            cell.style.background = "transparent";
-            cell.style.cursor = "default";
-          } else {
-            // Use displayCount for the colour level only (visual variety for low-count days)
-            const shown = (d.displayCount !== undefined) ? d.displayCount : d.count;
-            const lvl = levelFor(shown);
-            cell.style.background = PALETTE[lvl];
-            cell.addEventListener("mousemove", (e) => {
-              tooltip.style.display = "block";
-              tooltip.style.left = e.clientX + 14 + "px";
-              tooltip.style.top  = e.clientY + 14 + "px";
-              // Always show the REAL count in the tooltip, not the visual display count
-              tooltip.textContent = `${d.date}: ${d.count} contribution${d.count === 1 ? "" : "s"}`;
-            });
-            cell.addEventListener("mouseleave", () => { tooltip.style.display = "none"; });
-          }
-          grid.appendChild(cell);
-        });
-      });
-
-      wrap.appendChild(grid);
-
-      const legend = document.createElement("div");
-      legend.className = "legend";
-      legend.innerHTML = "less ";
-      PALETTE.forEach((c) => {
-        legend.innerHTML += `<span class="cell" style="background:${c}"></span> `;
-      });
-      legend.innerHTML += " more";
-      wrap.appendChild(legend);
-
-      return wrap;
-    }
-
-
-    /* ---------------------------------------------------------------------- */
     const COMMANDS = {
+
       help() {
         line(`<span class="out-white">available commands:</span>`);
         [
-          ["whoami", "who is this guy anyway"],
-          ["experience", "work history"],
-          ["skills", "tech stack"],
-          ["projects", "things I've shipped"],
+          ["whoami",        "who is this guy anyway"],
+          ["experience",    "work history"],
+          ["skills",        "tech stack"],
+          ["projects",      "things I've shipped"],
           ["contributions", "live GitHub contribution heatmap"],
-          ["streak", "current / longest streak"],
-          ["contact", "how to reach me"],
-          ["photo", "animated ascii self-portrait"],
-          ["matrix", "toggle a little fun"],
-          ["clear", "clear the terminal"],
-        ].forEach(([c, d]) => line(`  <span class="out-cmd">${c.padEnd(15)}</span><span class="out-dim">${d}</span>`));
+          ["streak",        "current / longest streak & best day"],
+          ["contact",       "how to reach me"],
+          ["photo",         "animated ascii self-portrait"],
+          ["open",          "open [portfolio|linkedin|github]"],
+          ["matrix",        "toggle a little fun"],
+          ["clear",         "clear the terminal"],
+        ].forEach(([c, d]) =>
+          line(`  <span class="out-cmd">${c.padEnd(15)}</span><span class="out-dim">${d}</span>`)
+        );
       },
+
       whoami() {
         line(`<span class="out-white">ECE Undergraduate @ College of Engineering Kidangoor ('28), Kerala, India</span>`);
         blank();
@@ -715,66 +797,57 @@
         line(`<span class="out-dim">Building AI-powered Embedded Systems &amp; Intelligent Hardware</span>`);
         line(`<span class="out-dim">Focused on Embedded Systems, PCB Design, Full-Stack Development, and AI</span>`);
       },
+
       experience() {
         [
-          ["2026 - Present", "Chairperson", "IEEE IAS SBC CE Kidangoor"],
-          ["2025 - Present", "Founder & Product Developer", "VAZA"],
-          ["2025 - Present", "Embedded Systems Engineer", "AgriGuard"],
-          ["2025 - Present", "Full-Stack Developer", "Personal & Open-Source Projects"],
-          ["2025 - 2026", "Vice Chairperson", "IEEE IAS SBC CE Kidangoor"],
-        ].forEach(([d, r, c]) => line(`<span class="out-green">${d.padEnd(16)}</span><span class="out-white">${r.padEnd(29)}</span><span class="out-dim">${c}</span>`));
+          ["2026 - Present", "Chairperson",              "IEEE IAS SBC CE Kidangoor"],
+          ["2025 - Present", "Founder & Product Dev",    "VAZA"],
+          ["2025 - Present", "Embedded Systems Engineer","AgriGuard"],
+          ["2025 - Present", "Full-Stack Developer",     "Personal & Open-Source"],
+          ["2025 - 2026",    "Vice Chairperson",         "IEEE IAS SBC CE Kidangoor"],
+        ].forEach(([d, r, c]) =>
+          line(`<span class="out-green">${d.padEnd(16)}</span>` +
+               `<span class="out-white">${r.padEnd(24)}</span>` +
+               `<span class="out-dim">${c}</span>`)
+        );
       },
+
       skills() {
-        line(`<span class="out-cmd">embedded</span>  ESP32, STM32, Arduino, Embedded C/C++, FreeRTOS, PlatformIO, UART, I2C, SPI, CAN`);
-        line(`<span class="out-cmd">hardware</span>  PCB Design (KiCad), Circuit Design, Soldering, Sensor Integration, Power Electronics`);
-        line(`<span class="out-cmd">frontend</span>  React, Next.js, TypeScript, Tailwind CSS, HTML5, CSS3, JavaScript`);
-        line(`<span class="out-cmd">backend </span>  Node.js, Express, Python, Firebase, Supabase, REST APIs, PostgreSQL`);
-        line(`<span class="out-cmd">ai / ml </span>  OpenAI API, LangChain, AI Agents, TensorFlow Lite, Computer Vision`);
-        line(`<span class="out-cmd">iot     </span>  MQTT, LoRa, Blynk, Firebase, Wi-Fi, BLE, GPS, IoT System Design`);
-        line(`<span class="out-cmd">tools   </span>  Git, GitHub, Docker, Linux, VS Code, Postman, Figma`);
+        [
+          ["embedded", "ESP32, STM32, Arduino, Embedded C/C++, FreeRTOS, PlatformIO, UART, I2C, SPI, CAN"],
+          ["hardware", "PCB Design (KiCad), Circuit Design, Soldering, Sensor Integration, Power Electronics"],
+          ["frontend", "React, Next.js, TypeScript, Tailwind CSS, HTML5, CSS3, JavaScript"],
+          ["backend ", "Node.js, Express, Python, Firebase, Supabase, REST APIs, PostgreSQL"],
+          ["ai / ml ", "OpenAI API, LangChain, AI Agents, TensorFlow Lite, Computer Vision"],
+          ["iot     ", "MQTT, LoRa, Blynk, Firebase, Wi-Fi, BLE, GPS, IoT System Design"],
+          ["tools   ", "Git, GitHub, Docker, Linux, VS Code, Postman, Figma"],
+        ].forEach(([k, v]) =>
+          line(`<span class="out-cmd">${k}</span>  ${escapeHtml(v)}`)
+        );
       },
+
       projects() {
         [
-          ["AgriGuard", "ESP32 + LoRa + AI — Smart livestock health monitoring system", "https://github.com/Kesicode/AgriGuard"],
-          ["VAZA", "AI-powered productivity platform with intelligent workflows", ""],
-          ["PCB Design Portfolio", "KiCad — Custom PCB designs for Embedded & IoT Systems", "https://github.com/Kesicode/pcb-designs"],
-          ["Portfolio", "Next.js + React + Tailwind — Interactive developer portfolio", "https://github.com/Kesicode/portfolio"],
-          ["AI Experiments", "OpenAI API, LangChain & AI agents for real-world applications", ""],
+          ["AgriGuard",           "ESP32 + LoRa + AI — Smart livestock health monitoring system",    "https://github.com/Kesicode/AgriGuard"],
+          ["VAZA",                "AI-powered productivity platform with intelligent workflows",     ""],
+          ["PCB Design Portfolio","KiCad — Custom PCB designs for Embedded & IoT Systems",          "https://github.com/Kesicode/pcb-designs"],
+          ["Portfolio Site",      "Next.js + React + Tailwind — Interactive developer portfolio",   "https://github.com/Kesicode/portfolio"],
+          ["AI Experiments",      "OpenAI API, LangChain & AI agents for real-world applications",  ""],
         ].forEach(([n, d, url]) => {
-          line(`<span class="out-cmd">&gt; ${n}</span>`);
-          line(`  <span class="out-dim">${d}</span>`);
-          if (url) line(`  <a href="${url}" target="_blank" rel="noopener">${url}</a>`);
+          line(`<span class="out-cmd">&gt; ${escapeHtml(n)}</span>`);
+          line(`  <span class="out-dim">${escapeHtml(d)}</span>`);
+          if (url) line(`  <a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
         });
       },
-      contact() {
-        line(`<span class="out-white">portfolio</span>  <a href="https://kashinadh.com" target="_blank">kashinadh.com</a>`);
-        line(`<span class="out-white">linkedin </span>  <a href="https://linkedin.com/in/k-s-kashinadh" target="_blank">linkedin.com/in/k-s-kashinadh</a>`);
-        line(`<span class="out-white">github   </span>  <a href="https://github.com/Kesicode" target="_blank">github.com/Kesicode</a>`);
-        line(`<span class="out-white">email    </span>  <a href="mailto:kskashinadh4@gmail.com">kskashinadh4@gmail.com</a>`);
-      },
-      photo() {
-        const img = document.createElement("img");
-        img.src = "./kashinadh-ascii.svg";
-        img.style.maxWidth = "100%";
-        img.style.borderRadius = "8px";
-        img.style.border = "1px solid var(--frame)";
-        img.alt = "animated ascii self-portrait";
-        const div = document.createElement("div");
-        div.className = "line";
-        div.appendChild(img);
-        term.appendChild(div);
-        term.scrollTop = term.scrollHeight;
-      },
-      streak() {
-        if (!DATA) { line(`<span class="out-dim">loading contribution data...</span>`); return; }
-        line(`<span class="out-green">current streak:</span>  ${DATA.current_streak.length} days (${DATA.current_streak.start} → ${DATA.current_streak.end})`);
-        line(`<span class="out-green">longest streak:</span>  ${DATA.longest_streak.length} days (${DATA.longest_streak.start} → ${DATA.longest_streak.end})`);
-        line(`<span class="out-green">best day:</span>       ${DATA.best_day.count} contributions on ${DATA.best_day.date}`);
-        line(`<span class="out-green">total:</span>          ${DATA.total_contributions.toLocaleString()} contributions since ${DATA.range.start}`);
-      },
+
       contributions() {
-        if (!DATA) { line(`<span class="out-dim">loading contribution data...</span>`); return; }
-        line(`<span class="out-dim">${DATA.total_contributions.toLocaleString()} contributions · ${DATA.range.start} → ${DATA.range.end}</span>`);
+        if (!DATA) {
+          line(`<span class="out-dim">⏳ loading contribution data — try again in a second...</span>`);
+          return;
+        }
+        line(`<span class="out-dim">${DATA.total_contributions.toLocaleString()} contributions` +
+             ` · ${DATA.range.start} → ${DATA.range.end}` +
+             ` · updated ${DATA.generated_at ? new Date(DATA.generated_at).toLocaleString() : "recently"}</span>`);
         const div = document.createElement("div");
         div.className = "line";
         div.appendChild(buildHeatmapEl());
@@ -782,108 +855,244 @@
         term.scrollTop = term.scrollHeight;
         line(`<span class="out-dim">hover a cell for the exact date and count</span>`);
       },
+
+      streak() {
+        if (!DATA) {
+          line(`<span class="out-dim">⏳ loading contribution data — try again in a second...</span>`);
+          return;
+        }
+        const cs = DATA.current_streak;
+        const ls = DATA.longest_streak;
+        const bd = DATA.best_day;
+        blank();
+        line(`<span class="out-green">current streak  </span> ${cs.length} days  (${cs.start} → ${cs.end})`);
+        line(`<span class="out-green">longest streak  </span> ${ls.length} days  (${ls.start} → ${ls.end})`);
+        line(`<span class="out-green">best day        </span> ${bd.count} contributions on ${bd.date}`);
+        line(`<span class="out-green">total (365 days)</span> ${DATA.total_contributions.toLocaleString()} contributions`);
+        line(`<span class="out-green">active days     </span> ${DATA.active_days} / 365  (${Math.round(DATA.active_days / 365 * 100)}% of the year)`);
+        blank();
+      },
+
+      contact() {
+        [
+          ["portfolio", "https://kashinadh.com",                     "kashinadh.com"],
+          ["linkedin ", "https://linkedin.com/in/k-s-kashinadh",     "linkedin.com/in/k-s-kashinadh"],
+          ["github   ", "https://github.com/Kesicode",               "github.com/Kesicode"],
+          ["email    ", "mailto:kskashinadh4@gmail.com",             "kskashinadh4@gmail.com"],
+        ].forEach(([label, href, text]) =>
+          line(`<span class="out-white">${label}</span>  <a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`)
+        );
+      },
+
+      photo() {
+        const img = document.createElement("img");
+        img.src            = "./kashinadh-ascii.svg";
+        img.style.maxWidth = "100%";
+        img.style.borderRadius = "8px";
+        img.style.border   = "1px solid var(--frame)";
+        img.alt            = "Kashinadh animated ASCII self-portrait";
+        const div = document.createElement("div");
+        div.className = "line";
+        div.appendChild(img);
+        term.appendChild(div);
+        term.scrollTop = term.scrollHeight;
+      },
+
       matrix() {
         toggleMatrix();
-        line(`<span class="out-dim">${matrixOn ? "matrix mode on -- type 'matrix' again to turn it off" : "back to normal"}</span>`);
+        line(`<span class="out-dim">${matrixOn
+          ? "matrix mode on — type 'matrix' again to turn it off"
+          : "back to normal"}</span>`);
       },
-      clear() {
-        term.innerHTML = "";
-      },
+
       banner() {
         line(`<pre style="color:var(--green);margin:0;font-size:9px;">${BANNER}</pre>`);
       },
-      sudo(args) {
-        line(`<span class="out-yellow">[sudo] password for kashinadh:</span> <span class="out-dim">nice try. this is a static site.</span>`);
+
+      clear() {
+        term.innerHTML = "";
+      },
+
+      sudo() {
+        line(`<span class="out-yellow">[sudo] password for kashinadh:</span> ` +
+             `<span class="out-dim">nice try. this is a static site.</span>`);
       },
     };
-    COMMANDS["about"] = COMMANDS.whoami;
-    COMMANDS["ls"] = COMMANDS.projects;
 
+    // Command aliases
+    COMMANDS["about"] = COMMANDS.whoami;
+    COMMANDS["ls"]    = COMMANDS.projects;
+    COMMANDS["cat"]   = COMMANDS.whoami;
+
+    /** Parse and execute a raw command string. */
     function runCommand(raw) {
       const trimmed = raw.trim();
-      line(`<span class="prompt-tag">kesi@github:~$</span> <span class="out-white">${escapeHtml(trimmed)}</span>`, "prompt-line");
+      // Echo the typed command
+      line(
+        `<span class="prompt-tag">kesi@github:~$</span> ` +
+        `<span class="out-white">${escapeHtml(trimmed)}</span>`,
+        "prompt-line"
+      );
       if (!trimmed) return;
+
       const [cmd, ...args] = trimmed.split(/\s+/);
       const key = cmd.toLowerCase();
+
+      // Special: `open <target>`
       if (key === "open") {
         const target = (args[0] || "").toLowerCase();
-        const map = {
+        const urls = {
           portfolio: "https://kashinadh.com",
-          linkedin: "https://linkedin.com/in/k-s-kashinadh",
-          github: "https://github.com/Kesicode",
+          linkedin:  "https://linkedin.com/in/k-s-kashinadh",
+          github:    "https://github.com/Kesicode",
         };
-        if (map[target]) { line(`<span class="out-dim">opening ${target}...</span>`); window.open(map[target], "_blank"); }
-        else line(`<span class="out-dim">usage: open [portfolio|linkedin|github]</span>`);
+        if (urls[target]) {
+          line(`<span class="out-dim">opening ${target}...</span>`);
+          window.open(urls[target], "_blank", "noopener,noreferrer");
+        } else {
+          line(`<span class="out-dim">usage: open [portfolio|linkedin|github]</span>`);
+        }
         return;
       }
-      if (COMMANDS[key]) { COMMANDS[key](args); }
-      else line(`<span class="out-dim">command not found: ${escapeHtml(cmd)} — type 'help'</span>`);
+
+      if (COMMANDS[key]) {
+        COMMANDS[key](args);
+      } else {
+        line(`<span class="out-dim">command not found: ${escapeHtml(cmd)} — type 'help' for commands</span>`);
+      }
     }
 
-    function escapeHtml(s) {
-      return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-    }
+    /* ── 6. INPUT HANDLING ──────────────────────────────────────────────────── */
 
+    // Mirror typed text into the visible span (real input is opacity:0)
     input.addEventListener("input", () => {
       document.getElementById("cmdText").textContent = input.value;
     });
-    input.addEventListener("keydown", (e) => {
+
+    input.addEventListener("keydown", e => {
       if (e.key === "Enter") {
         const val = input.value;
         input.value = "";
         document.getElementById("cmdText").textContent = "";
+        if (val.trim()) {
+          cmdHistory.unshift(val.trim()); // push to front
+          if (cmdHistory.length > 50) cmdHistory.pop(); // cap history
+        }
+        historyIndex = -1;
         runCommand(val);
+        return;
+      }
+
+      // ↑ / ↓ history navigation
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (historyIndex < cmdHistory.length - 1) {
+          historyIndex++;
+          input.value = cmdHistory[historyIndex];
+          document.getElementById("cmdText").textContent = input.value;
+        }
+        return;
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (historyIndex > 0) {
+          historyIndex--;
+          input.value = cmdHistory[historyIndex];
+          document.getElementById("cmdText").textContent = input.value;
+        } else {
+          historyIndex = -1;
+          input.value = "";
+          document.getElementById("cmdText").textContent = "";
+        }
+        return;
+      }
+
+      // Tab completion (basic)
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const partial = input.value.trim().toLowerCase();
+        if (!partial) return;
+        const matches = Object.keys(COMMANDS).filter(k => k.startsWith(partial));
+        if (matches.length === 1) {
+          input.value = matches[0];
+          document.getElementById("cmdText").textContent = matches[0];
+        } else if (matches.length > 1) {
+          line(`<span class="out-dim">${matches.join("  ")}</span>`);
+        }
       }
     });
-    document.addEventListener("click", (e) => {
-      // Only focus the input when clicking inside the terminal window,
-      // not on links/buttons, and not when the user is selecting text.
-      const termWindow = document.querySelector(".window");
+
+    // Click-to-focus — only inside the terminal, not on links, not while selecting text
+    document.addEventListener("click", e => {
+      const termWindow   = document.querySelector(".window");
       const isInTerminal = termWindow && termWindow.contains(e.target);
-      const isLink = e.target.closest("a, button");
-      const hasSelection = window.getSelection && window.getSelection().toString();
+      const isLink       = e.target.closest("a, button");
+      const hasSelection = window.getSelection?.().toString();
       if (isInTerminal && !isLink && !hasSelection) input.focus();
     });
 
-    /* ---------------------------------------------------------------------- */
-    let matrixOn = false;
+    /* ── 7. MATRIX ANIMATION ────────────────────────────────────────────────── */
+
+    let matrixOn  = false;
+    let matrixRaf = null; // requestAnimationFrame handle for cleanup
+
     function toggleMatrix() {
       matrixOn = !matrixOn;
       const canvas = document.getElementById("matrixCanvas");
       canvas.style.display = matrixOn ? "block" : "none";
-      if (matrixOn) startMatrix();
+      if (matrixOn) {
+        startMatrix(canvas);
+      } else if (matrixRaf) {
+        cancelAnimationFrame(matrixRaf); // stop animation loop cleanly
+        matrixRaf = null;
+      }
     }
-    function startMatrix() {
-      const canvas = document.getElementById("matrixCanvas");
-      const ctx = canvas.getContext && canvas.getContext("2d");
-      if (!ctx) return; // canvas 2d not available in this environment -- skip quietly
-      canvas.width = window.innerWidth;
+
+    function startMatrix(canvas) {
+      const ctx = canvas.getContext?.("2d");
+      if (!ctx) return;
+
+      canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
-      const cols = Math.floor(canvas.width / 14);
+
+      const cols  = Math.floor(canvas.width / 14);
       const drops = new Array(cols).fill(0);
       const chars = "01アビヴァシシュタ<>/{}[]#*";
+
       function draw() {
         if (!matrixOn) return;
         ctx.fillStyle = "rgba(13,17,23,0.12)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#39d353";
-        ctx.font = "13px monospace";
+        ctx.font      = "13px monospace";
         drops.forEach((y, i) => {
           const ch = chars[Math.floor(Math.random() * chars.length)];
           ctx.fillText(ch, i * 14, y * 14);
           drops[i] = y * 14 > canvas.height && Math.random() > 0.975 ? 0 : y + 1;
         });
-        requestAnimationFrame(draw);
+        matrixRaf = requestAnimationFrame(draw);
       }
       draw();
     }
 
-    /* ---------------------------------------------------------------------- */
+    // Resize matrix canvas when window resizes
+    window.addEventListener("resize", () => {
+      if (!matrixOn) return;
+      const canvas = document.getElementById("matrixCanvas");
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    /* ── 8. BOOT ────────────────────────────────────────────────────────────── */
+
+    document.getElementById("bannerArt").textContent = BANNER;
+
     function boot() {
       line(`<span class="out-green">connected to github.com/Kesicode</span>`);
       line(`<span class="out-dim">type 'help' to see available commands</span>`);
       blank();
 
+      // Stats box — created here so renderStats() can find it immediately
       const statsWrap = document.createElement("div");
       statsWrap.className = "line";
       statsWrap.innerHTML = `<div class="stats" id="statsBox"></div>`;
@@ -894,8 +1103,10 @@
       input.focus();
     }
 
-    loadData();
+    // Boot and fetch in parallel — boot sets up the DOM first so statsBox exists
     boot();
+    loadData();
+
   </script>
 </body>
 
